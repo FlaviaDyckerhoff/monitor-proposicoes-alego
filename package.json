@@ -1,0 +1,12 @@
+{
+  "name": "monitor-proposicoes-alego-go",
+  "version": "1.0.0",
+  "description": "Monitor automático de proposições da Assembleia Legislativa de Goiás",
+  "main": "monitor.js",
+  "scripts": {
+    "start": "node monitor.js"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.0"
+  }
+}
