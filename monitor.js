@@ -6,6 +6,7 @@ const EMAIL_REMETENTE = process.env.EMAIL_REMETENTE || 'flavia@monitorlegislativ
 const EMAIL_SENHA = process.env.EMAIL_SENHA;
 const ARQUIVO_ESTADO = 'estado.json';
 const URL_BASE = 'https://alegodigital.al.go.leg.br/spl/consulta-producao.aspx';
+const SITE_ORIGIN = 'https://alegodigital.al.go.leg.br';
 const ANO = new Date().getFullYear();
 const ITENS_POR_PAGINA = 50;
 const MAX_PAGINAS_PRIMEIRO_RUN = 10; // 500 proposições no backlog inicial
@@ -101,6 +102,9 @@ function parseProposicoes(html) {
 
     const tituloMatch = bloco.match(/kt-widget5__title[^>]*>\s*([^<]+?)\s*<\/a>/);
     const titulo = tituloMatch ? tituloMatch[1].trim() : '-';
+    const hrefMatch = bloco.match(/<a\s+href=["']([^"']*processo\.aspx[^"']+)["'][^>]*class=["']kt-widget5__title/i)
+      || bloco.match(/href=["']([^"']*processo\.aspx[^"']+)["']/i);
+    const url = hrefMatch ? new URL(hrefMatch[1], SITE_ORIGIN).href : `${URL_BASE}?ano=${ANO}&ano_proposicao=${ANO}`;
 
     const tipoNumMatch = titulo.match(/^(.+?)\s+n[°º]\s*(\d+)\/\d+/);
     const tipo = tipoNumMatch ? tipoNumMatch[1].trim() : titulo;
@@ -123,7 +127,7 @@ function parseProposicoes(html) {
     const processoMatch = bloco.match(/Processo N°:<\/span>\s*<a[^>]*>([^<]+)<\/a>/);
     const processo = processoMatch ? processoMatch[1].trim() : '-';
 
-    proposicoes.push({ id, tipo, numero, ementa, data, autor, processo });
+    proposicoes.push({ id, tipo, numero, ementa, data, autor, processo, url });
   }
 
   return proposicoes;
@@ -351,7 +355,7 @@ async function enviarEmail(novas) {
       .sort((a, b) => (parseInt(b.numero) || 0) - (parseInt(a.numero) || 0))
       .map(p => `<tr>
         <td style="padding:8px;border-bottom:1px solid #eee;font-size:12px;white-space:nowrap">${p.tipo || '-'}</td>
-        <td style="padding:8px;border-bottom:1px solid #eee;white-space:nowrap"><strong>${p.numero || '-'}/${ANO}</strong></td>
+        <td style="padding:8px;border-bottom:1px solid #eee;white-space:nowrap"><strong><a href="${p.url || URL_BASE}" style="color:#003366;text-decoration:none">${p.numero || '-'}/${ANO}</a></strong></td>
         <td style="padding:8px;border-bottom:1px solid #eee;font-size:12px">${p.autor || '-'}</td>
         <td style="padding:8px;border-bottom:1px solid #eee;font-size:12px;white-space:nowrap">${p.data ? p.data.substring(0, 16) : '-'}</td>
         <td style="padding:8px;border-bottom:1px solid #eee;font-size:12px">${p.ementa || '-'}</td>
@@ -362,7 +366,7 @@ async function enviarEmail(novas) {
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:960px;margin:0 auto">
       <h2 style="color:#003366;border-bottom:2px solid #003366;padding-bottom:8px">
-        🏛️ ALEGO-GO — ${novas.length} nova(s) proposição(ões)
+        🏛️ ALEGO — ${novas.length} nova(s) proposição(ões)
       </h2>
       <p style="color:#666;font-size:13px">Assembleia Legislativa de Goiás · Monitoramento automático · ${new Date().toLocaleString('pt-BR')}</p>
       <table style="width:100%;border-collapse:collapse;font-size:14px">
@@ -384,9 +388,9 @@ async function enviarEmail(novas) {
   `;
 
   await transporter.sendMail({
-    from: `"Monitor ALEGO-GO" <${EMAIL_REMETENTE}>`,
+    from: `"Monitor ALEGO" <${EMAIL_REMETENTE}>`,
     to: EMAIL_DESTINO,
-    subject: `🏛️ ALEGO-GO: ${novas.length} nova(s) proposição(ões) — ${new Date().toLocaleDateString('pt-BR')}`,
+    subject: `🏛️ ALEGO: ${novas.length} nova(s) proposição(ões) — ${new Date().toLocaleDateString('pt-BR')}`,
     html,
   });
 
@@ -396,7 +400,7 @@ async function enviarEmail(novas) {
 // ─── Entry point ──────────────────────────────────────────────────────────────
 
 (async () => {
-  console.log('🚀 Monitor ALEGO-GO iniciado');
+  console.log('🚀 Monitor ALEGO iniciado');
   console.log(`⏰ ${new Date().toLocaleString('pt-BR')}`);
   console.log(`🔍 Tipos monitorados: ${TIPOS_MONITORADOS.length}`);
 

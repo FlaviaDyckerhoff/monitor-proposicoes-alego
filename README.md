@@ -1,4 +1,4 @@
-# 🏛️ Monitor Proposições ALEGO-GO — Assembleia Legislativa de Goiás
+# 🏛️ Monitor Proposições ALEGO — Assembleia Legislativa de Goiás
 
 Monitora automaticamente o portal da Assembleia Legislativa de Goiás e envia email quando há proposições novas nos tipos selecionados. Roda **4x por dia** via GitHub Actions (8h, 12h, 17h e 21h, horário de Brasília).
 
