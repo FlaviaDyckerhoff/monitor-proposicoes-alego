@@ -366,7 +366,7 @@ async function enviarEmail(novas) {
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:960px;margin:0 auto">
       <h2 style="color:#003366;border-bottom:2px solid #003366;padding-bottom:8px">
-        🏛️ ALEGO — ${novas.length} nova(s) proposição(ões)
+        🏛️ Assembleia Legislativa de Goiás — ${novas.length} nova(s) proposição(ões)
       </h2>
       <p style="color:#666;font-size:13px">Assembleia Legislativa de Goiás · Monitoramento automático · ${new Date().toLocaleString('pt-BR')}</p>
       <table style="width:100%;border-collapse:collapse;font-size:14px">
@@ -382,15 +382,15 @@ async function enviarEmail(novas) {
         <tbody>${linhas}</tbody>
       </table>
       <p style="margin-top:20px;font-size:12px;color:#999">
-        Acesse: <a href="https://alegodigital.al.go.leg.br/spl/consulta-producao.aspx?ano=${ANO}&ano_proposicao=${ANO}">Portal ALEGO</a>
+        Acesse: <a href="https://alegodigital.al.go.leg.br/spl/consulta-producao.aspx?ano=${ANO}&ano_proposicao=${ANO}">Portal da Assembleia Legislativa de Goiás</a>
       </p>
     </div>
   `;
 
   await transporter.sendMail({
-    from: `"Monitor ALEGO" <${EMAIL_REMETENTE}>`,
+    from: `"Monitor Goiás" <${EMAIL_REMETENTE}>`,
     to: EMAIL_DESTINO,
-    subject: `🏛️ ALEGO: ${novas.length} nova(s) proposição(ões) — ${new Date().toLocaleDateString('pt-BR')}`,
+    subject: `🏛️ Goiás: ${novas.length} nova(s) proposição(ões) — ${new Date().toLocaleDateString('pt-BR')}`,
     html,
   });
 
