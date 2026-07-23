@@ -18,6 +18,10 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Corrigir permissões do workspace
+        run: |
+          sudo chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE" 2>/dev/null || true
+
       - name: Instalar dependências
         run: npm install
 
@@ -26,6 +30,9 @@ jobs:
           EMAIL_REMETENTE: ${{ secrets.EMAIL_REMETENTE }}
           EMAIL_SENHA: ${{ secrets.EMAIL_SENHA }}
           EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
+          CONTROLE03_API_USER: ${{ secrets.CONTROLE03_API_USER }}
+          CONTROLE03_API_PASS: ${{ secrets.CONTROLE03_API_PASS }}
+          CONTROLE03_STATE_URL: ${{ secrets.CONTROLE03_STATE_URL }}
         run: node monitor.js
 
       - name: Salvar estado
