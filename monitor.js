@@ -10,6 +10,7 @@ function fichaEmailButtonHtml() {
 
 const fs = require('fs');
 const nodemailer = require('nodemailer');
+const { enrich: enriquecerOrigensVetos, render: renderizarOrigensVeto } = require('./veto_origins');
 let promoverInteresseClienteProposicao = (_item, atuais) => Array.isArray(atuais) ? atuais : [];
 try {
   try {
@@ -779,6 +780,7 @@ async function enviarEmail(novas) {
     return;
   }
 
+  await enriquecerOrigensVetos(novas, parseProposicoes);
   anotarClientesCitados(novas);
   const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -803,7 +805,7 @@ async function enviarEmail(novas) {
         <td style="padding:8px;border-bottom:1px solid #eee;white-space:nowrap"><strong><a href="${p.url || URL_BASE}" style="color:#003366;text-decoration:none">${p.numero || '-'}/${ANO}</a></strong></td>
         <td style="padding:8px;border-bottom:1px solid #eee;font-size:12px">${p.autor || '-'}</td>
         <td style="padding:8px;border-bottom:1px solid #eee;font-size:12px;white-space:nowrap">${p.data ? p.data.substring(0, 16) : '-'}</td>
-        <td style="padding:8px;border-bottom:1px solid #eee;font-size:12px">${renderizarEmentaCliente(p)}</td>
+        <td style="padding:8px;border-bottom:1px solid #eee;font-size:12px">${renderizarEmentaCliente(p)}${renderizarOrigensVeto(p)}</td>
       </tr>`).join('');
     return header + rows;
   }).join('');
